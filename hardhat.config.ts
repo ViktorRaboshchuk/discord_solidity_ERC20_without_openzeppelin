@@ -23,7 +23,7 @@ const config: HardhatUserConfig = {
   networks: {
     goerli: {
       url: process.env.STAGING_QUICK_NODE || "http://127.0.0.1",
-      accounts: [process.env.METAMASK_PRIVATE_KEY as string || "test test test test test test test test test test test junk"]
+      accounts: [process.env.METAMASK_PRIVATE_KEY as string || "0x0000000000000000000000000000000000000000000000000000000000000000"]
     }
   },
   etherscan: {
