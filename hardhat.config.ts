@@ -22,7 +22,7 @@ const config: HardhatUserConfig = {
   solidity: "0.8.17",
   networks: {
     goerli: {
-      url: process.env.STAGING_QUICK_NODE,
+      url: [process.env.STAGING_QUICK_NODE as string],
       accounts: [process.env.METAMASK_PRIVATE_KEY as string]
     }
   },
