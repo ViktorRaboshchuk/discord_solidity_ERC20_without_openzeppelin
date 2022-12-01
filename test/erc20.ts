@@ -15,29 +15,29 @@ describe("ERC20", function () {
   beforeEach(async () => {
     [owner, addr1, addr2] = await ethers.getSigners();
     const ERC20Token = await hre.ethers.getContractFactory("ERC20", {signer: owner});
-    erc20Token = await ERC20Token.deploy("BTC", "Bitcoin");
+    erc20Token = await ERC20Token.deploy();
   });
 
 
   describe("Check contract constructor", () => {
     it("Should mint 1000 BTC tokes", async function () {
-      const mint_amount = BigInt(1000 * 10 ** 18);
+      const mint_amount = BigInt(1000 * 10 ** 5);
       const balance = await erc20Token.balanceOf(owner.address);
       expect(await balance).to.equal(mint_amount);
     });
 
     it("Check contract token name", async function () {
-      const token_name = "BTC";
+      const token_name = "Bitcoin";
       expect(await erc20Token.name()).to.equal(token_name);
     });
 
     it("Check contract token symbol", async function () {
-      const token_symbol = "Bitcoin";
+      const token_symbol = "BTC";
       expect(await erc20Token.symbol()).to.equal(token_symbol);
     });
 
     it("Check contract total supply", async function () {
-      const total_supply = BigInt(1000 * 10 ** 18);
+      const total_supply = BigInt(1000 * 10 ** 5);
       expect(await erc20Token.totalSupply()).to.equal(total_supply);
     });
   });
@@ -59,7 +59,7 @@ describe("ERC20", function () {
 
   describe("Check function transfer", async function () {
     it("Check transaction success and Check addr1 received amount", async function(){
-      let amount_to_sent = BigInt(1 * 10 ** 18);
+      let amount_to_sent = BigInt(1 * 10 ** 5);
       const transaction = await erc20Token.transfer(addr1.address, amount_to_sent);
       expect(Boolean(transaction.value)).to.equal(true);
       const addr1_balance = await erc20Token.balanceOf(addr1.address);
@@ -67,12 +67,12 @@ describe("ERC20", function () {
     });
 
     it("Check transaction failed due to  transfer amount exceeds balance", async function(){
-      let exedet_amount = BigInt(1001 * 10 ** 18);
+      let exedet_amount = BigInt(1001 * 10 ** 5);
       await expect(erc20Token.transfer(addr1.address, exedet_amount)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
     });
 
     it("Check transaction owner dicrease in balace", async function() {
-      let amount_to_sent = BigInt(1 * 10 ** 18);
+      let amount_to_sent = BigInt(1 * 10 ** 5);
       const owner_balance_before = await erc20Token.balanceOf(owner.address);
       await erc20Token.transfer(addr1.address, amount_to_sent);
       const owner_balance_after = await erc20Token.balanceOf(owner.address);

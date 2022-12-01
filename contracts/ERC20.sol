@@ -2,8 +2,9 @@ pragma solidity ^0.8.17;
 
 contract ERC20 {
 
-  string public _name;
-  string public _symbol;
+  string constant _name = "Bitcoin";
+  string constant _symbol = "BTC";
+  uint8 immutable _decimals = 5;
   uint256 public _totalSupply;
 
   mapping(address => uint256) private _balances;
@@ -13,10 +14,8 @@ contract ERC20 {
   event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
 
-  constructor(string memory name_, string memory symbol_) {
-    _name = name_;
-    _symbol = symbol_;
-    _mint(msg.sender, 1000 * 10 ** 18);
+  constructor() {
+    _mint(msg.sender, 1000 * (10 **  uint256(decimals())));
   }
 
   function _mint(address account, uint256 amount) internal {
@@ -26,18 +25,18 @@ contract ERC20 {
     emit Transfer(address(0), account, amount);
   }
 
-  function name() public view returns (string memory){
+  function name() public pure returns (string memory){
     return _name;
   }
 
 
-  function symbol() public view returns (string memory) {
+  function symbol() public pure returns (string memory) {
     return _symbol;
   }
 
 
-  function decimals() public view returns (uint8) {
-    return 18;
+  function decimals() public pure returns (uint8) {
+    return _decimals;
   }
 
 
@@ -67,18 +66,13 @@ contract ERC20 {
     require(from != address(0), "ERC20: transfer from the zero address");
     require(to != address(0), "ERC20: trnsfer to the zero address");
 
-    _beforeTokenTransfer(from, to, amount);
 
     uint256 fromBalance = _balances[from];
     require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
-    unchecked {
-      _balances[from] = fromBalance - amount;
-      _balances[to] += amount;
-    }
+    _balances[from] = fromBalance - amount;
+    _balances[to] += amount;
 
     emit Transfer(from, to, amount);
-
-    _afterTokenTransfer(from, to, amount);
 
   }
 
@@ -114,10 +108,5 @@ contract ERC20 {
     _approve(owner, spender, _amount);
     return true;
   }
-
-
-  function _beforeTokenTransfer(address from, address to, uint256 amount) private {}
-
-  function _afterTokenTransfer(address from, address to, uint256 amount) private {}
 
 }
