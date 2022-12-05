@@ -15,11 +15,15 @@ contract ERC20Token {
 
 
   constructor() {
-    _mint(msg.sender, 1000 * (10 **  uint256(decimals())));
+    mint(msg.sender, 1000 * (10 **  uint256(decimals())));
+  }
+
+  function mint(address account, uint256 amount) public {
+    require(account != address(0), "ERC20: mint address equal to zero");
+    _mint(account, amount);
   }
 
   function _mint(address account, uint256 amount) internal virtual{
-    require(account != address(0), "ERC20: mint address equal to zero");
     _totalSupply = _totalSupply + amount;
     _balances[account] = _balances[account] + amount;
     emit Transfer(address(0), account, amount);
@@ -80,9 +84,11 @@ contract ERC20Token {
   function _spendAllowance(address owner, address spender, uint256 amount) public {
     uint256 currentAllowance = allowance(owner, spender);
     if (currentAllowance != type(uint256).max) {
-          require(currentAllowance >= amount, "ERC20: insufficient allowance");
-          _approve(owner, spender, currentAllowance - amount);
-      }
+      require(currentAllowance >= amount, "ERC20: insufficient allowance");
+      _approve(owner, spender, currentAllowance - amount);
+    } else {
+        revert("CurrentAllowance is too high");
+    }
   }
 
 

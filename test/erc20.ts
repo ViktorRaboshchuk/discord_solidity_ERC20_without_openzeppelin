@@ -41,9 +41,10 @@ describe("ERC20", function () {
       expect(await erc20Token.totalSupply()).to.equal(total_supply);
     });
 
-    // it("Check mint with owner address equal to zero", async function (){
-    //   expect(await erc20Token._mint(ethers.constants.AddressZero, 1000)).to.be.revertedWith("ERC20: mint address equal to zero");
-    // });
+    it("Check mint with owner address equal to zero", async function () {
+      expect( erc20Token.mint(ethers.constants.AddressZero, 1000)).to.be.revertedWith('ERC20: mint address equal to zero');
+    });
+
   });
 
   describe("Check approve functionality", async function () {
@@ -52,7 +53,7 @@ describe("ERC20", function () {
     });
 
     it("Check approve with sender address equal to 0", async function (){
-      await expect(erc20Token.approve(ethers.constants.AddressZero, 10)).to.be.revertedWith( 'ERC20: approve to zero address');
+      await expect(erc20Token.approve(ethers.constants.AddressZero, 10)).to.be.revertedWith('ERC20: approve to zero address');
     });
 
     it("Approve transaction to sender returns true", async function (){
@@ -95,25 +96,25 @@ describe("ERC20", function () {
   });
 
   describe("Check function transferFrom", async function () {
-    // it("Check trasnferFrom/currentAllowance failed due to allowance", async function() {
-    //   await erc20Token.approve(addr1.address, 10);
-    //   let max_value = hre.ethers.constants.MaxUint256;
-    //   const transferFromTrans = await erc20Token.connect(addr1).transferFrom(owner.address, addr1.address, max_value);
-    //   expect(Boolean(transferFromTrans.value)).to.equal(false);
-    // });
+      it("Check if currentAllowance equal to uint256.max", async function (){
+        let max_uint256_js = 2**256;
+        let max_uint256 = hre.ethers.BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        erc20Token.approve(addr2.address, max_uint256.toString());
+        await expect(erc20Token._spendAllowance(owner.address, addr2.address, max_uint256.toString())).to.be.revertedWith("CurrentAllowance is too high");
+      });
 
-    it("Check if currentAllowance equal to uint256.max", async function (){
-      await expect(erc20Token.transferFrom(owner.address, addr2.address, 10))
-    });
+      it("Check trasnferFrom failed due to allowance", async function() {
+        await expect(erc20Token.transferFrom(owner.address, addr2.address, 10)).to.be.revertedWith("ERC20: insufficient allowance");
+      });
 
-    it("Check transferFrom allowance and balanceOf addr1", async function () {
-      await erc20Token.approve(addr1.address, 100);
-      const addr1_allowances = await erc20Token.allowance(owner.address, addr1.address);
-      expect(addr1_allowances).to.equal(100);
-      const transferFromTrans = await erc20Token.connect(addr1).transferFrom(owner.address, addr1.address, 100);
-      expect(Boolean(transferFromTrans.value)).to.equal(true);
-      expect(await erc20Token.balanceOf(addr1.address)).to.equal(100);
+      it("Check transferFrom allowance and balanceOf addr1", async function () {
+        await erc20Token.approve(addr1.address, 100);
+        const addr1_allowances = await erc20Token.allowance(owner.address, addr1.address);
+        expect(addr1_allowances).to.equal(100);
+        const transferFromTrans = await erc20Token.connect(addr1).transferFrom(owner.address, addr1.address, 100);
+        expect(Boolean(transferFromTrans.value)).to.equal(true);
+        expect(await erc20Token.balanceOf(addr1.address)).to.equal(100);
+      });
     });
-  });
 
 });
