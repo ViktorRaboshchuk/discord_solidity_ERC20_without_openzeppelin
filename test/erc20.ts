@@ -14,7 +14,7 @@ describe("ERC20", function () {
 
   beforeEach(async () => {
     [owner, addr1, addr2] = await ethers.getSigners();
-    const ERC20Token = await hre.ethers.getContractFactory("ERC20", {signer: owner});
+    const ERC20Token = await hre.ethers.getContractFactory("ERC20Token", {signer: owner});
     erc20Token = await ERC20Token.deploy();
   });
 
@@ -40,6 +40,10 @@ describe("ERC20", function () {
       const total_supply = BigInt(1000 * 10 ** 5);
       expect(await erc20Token.totalSupply()).to.equal(total_supply);
     });
+
+    // it("Check mint with owner address equal to zero", async function (){
+    //   expect(await erc20Token._mint(ethers.constants.AddressZero, 1000)).to.be.revertedWith("ERC20: mint address equal to zero");
+    // });
   });
 
   describe("Check approve functionality", async function () {
@@ -66,6 +70,10 @@ describe("ERC20", function () {
       expect(addr1_balance).to.equal(amount_to_sent);
     });
 
+    it("Check transaction failed due to 'transfer from the zero address' error", async function() {
+      await expect(erc20Token._transfer(ethers.constants.AddressZero, addr1.address, 10)).to.be.revertedWith("ERC20: transfer from the zero address");
+    });
+
     it("Check transaction failed due to  transfer amount exceeds balance", async function(){
       let exedet_amount = BigInt(1001 * 10 ** 5);
       await expect(erc20Token.transfer(addr1.address, exedet_amount)).to.be.revertedWith("ERC20: transfer amount exceeds balance");
@@ -81,14 +89,21 @@ describe("ERC20", function () {
     });
 
     it("Check transaction failed receiver address equal to zero", async function(){
-      await expect(erc20Token.transfer(ethers.constants.AddressZero, 10)).to.be.revertedWith("ERC20: trnsfer to the zero address");
+      await expect(erc20Token.transfer(ethers.constants.AddressZero, 10)).to.be.revertedWith("ERC20: transfer to the zero address");
     });
 
   });
 
   describe("Check function transferFrom", async function () {
-    it("Check trasnferFrom failed due to allowance", async function() {
-      await expect(erc20Token.transferFrom(owner.address, addr2.address, 10)).to.be.revertedWith("ERC20: insufficient allowance");
+    // it("Check trasnferFrom/currentAllowance failed due to allowance", async function() {
+    //   await erc20Token.approve(addr1.address, 10);
+    //   let max_value = hre.ethers.constants.MaxUint256;
+    //   const transferFromTrans = await erc20Token.connect(addr1).transferFrom(owner.address, addr1.address, max_value);
+    //   expect(Boolean(transferFromTrans.value)).to.equal(false);
+    // });
+
+    it("Check if currentAllowance equal to uint256.max", async function (){
+      await expect(erc20Token.transferFrom(owner.address, addr2.address, 10))
     });
 
     it("Check transferFrom allowance and balanceOf addr1", async function () {

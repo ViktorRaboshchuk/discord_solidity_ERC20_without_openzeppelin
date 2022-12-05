@@ -1,6 +1,6 @@
 pragma solidity ^0.8.17;
 
-contract ERC20 {
+contract ERC20Token {
 
   string constant _name = "Bitcoin";
   string constant _symbol = "BTC";
@@ -18,8 +18,8 @@ contract ERC20 {
     _mint(msg.sender, 1000 * (10 **  uint256(decimals())));
   }
 
-  function _mint(address account, uint256 amount) internal {
-    require(account != address(0));
+  function _mint(address account, uint256 amount) internal virtual{
+    require(account != address(0), "ERC20: mint address equal to zero");
     _totalSupply = _totalSupply + amount;
     _balances[account] = _balances[account] + amount;
     emit Transfer(address(0), account, amount);
@@ -64,7 +64,7 @@ contract ERC20 {
 
   function _transfer(address from, address to, uint256 amount) public {
     require(from != address(0), "ERC20: transfer from the zero address");
-    require(to != address(0), "ERC20: trnsfer to the zero address");
+    require(to != address(0), "ERC20: transfer to the zero address");
 
 
     uint256 fromBalance = _balances[from];
@@ -79,12 +79,10 @@ contract ERC20 {
 
   function _spendAllowance(address owner, address spender, uint256 amount) public {
     uint256 currentAllowance = allowance(owner, spender);
-        if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "ERC20: insufficient allowance");
-            unchecked {
-                _approve(owner, spender, currentAllowance - amount);
-            }
-        }
+    if (currentAllowance != type(uint256).max) {
+          require(currentAllowance >= amount, "ERC20: insufficient allowance");
+          _approve(owner, spender, currentAllowance - amount);
+      }
   }
 
 
